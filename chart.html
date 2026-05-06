@@ -1,1 +1,36 @@
+<h2>Customer Chart</h2>
+<button onclick="toggle()">বাকি দেখাও</button>
 
+<div id="list"></div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("data")) || [];
+let showDue = false;
+
+function toggle(){
+  showDue = !showDue;
+  load();
+}
+
+function load(){
+  let html = "";
+
+  data.forEach(d=>{
+    if(showDue && d.due <=0) return;
+
+    html += `
+    <div>
+      <h3>${d.name}</h3>
+      জমি: ${d.amount} ${d.unit} <br>
+      মোট: ${d.total} <br>
+      নগদ: ${d.paid} <br>
+      বাকি: ${d.due}
+    </div>
+    <hr>`;
+  });
+
+  document.getElementById("list").innerHTML = html;
+}
+
+load();
+</script>
