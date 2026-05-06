@@ -1,1 +1,18 @@
+<button onclick="download()">Download CSV</button>
 
+<script>
+function download(){
+  let data = JSON.parse(localStorage.getItem("data")) || [];
+  let csv = "Name,Amount,Total,Paid,Due\n";
+
+  data.forEach(d=>{
+    csv += `${d.name},${d.amount},${d.total},${d.paid},${d.due}\n`;
+  });
+
+  let blob = new Blob([csv]);
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "report.csv";
+  a.click();
+}
+</script>
