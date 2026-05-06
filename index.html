@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Harvester Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial; padding: 10px; }
+    .card { background:#f2f2f2; padding:10px; margin:10px 0; border-radius:10px; }
+    input, select, button { width:100%; padding:10px; margin:5px 0; }
+  </style>
+</head>
+
+<body>
+
+<h2>🚜 Harvester Dashboard</h2>
+
+<div class="card">
+  <p>আজকের আয়: <span id="todayIncome">0</span> টাকা</p>
+  <p>বাকি: <span id="due">0</span> টাকা</p>
+  <p>মোট জমি: <span id="totalLand">0</span></p>
+  <p>তোলা টাকা: <span id="paid">0</span></p>
+</div>
+
+<h3>➕ Customer Add</h3>
+
+<input id="name" placeholder="নাম">
+
+<select id="unit">
+  <option value="kani">কানি</option>
+  <option value="gonda">গন্ডা</option>
+  <option value="katha">কাঠা</option>
+</select>
+
+<input id="amount" placeholder="পরিমাণ">
+
+<input id="rate" placeholder="রেট">
+
+<input id="paidInput" placeholder="নগদ পেয়েছি">
+
+<input id="note" placeholder="মন্তব্য">
+
+<button onclick="saveData()">Save</button>
+
+<h3 id="preview"></h3>
+
+<script>
+
+let data = JSON.parse(localStorage.getItem("data")) || [];
+
+function convertToKani(unit, amount){
+  if(unit=="kani") return amount;
+  if(unit=="gonda") return amount/20;
+  if(unit=="katha") return amount/5/20;
+}
+
+function calculate(){
+  let unit = document.getElementById("unit").value;
+  let amount = parseFloat(document.getElementById("amount").value);
+  let rate = parseFloat(document.getElementById("rate").value);
+
+  if(!amount || !rate) return;
+
+  let total = amount * rate;
+
+  document.getElementById("preview").innerText = "মোট টাকা: " + total;
+}
+
+document.getElementById("amount").oninput = calculate;
+document.getElementById("rate").oninput = calculate;
+
+function saveData(){
+  let name = document.getElementById("name").value;
+  let unit = document.getElementById("unit").value;
+  let amount = parseFloat(document.getElementById("amount").value);
+  let rate = parseFloat(document.getElementById("rate").value);
+  let paid = parseFloat(document.getElementById("paidInput").value) || 0;
+  let note = document.getElementById("note").value;
+
+  let total = amount * rate;
+
+  data.push({
+    name, unit, amount, rate, total, paid,
+    due: total - paid,
+    date: new Date().toLocaleDateString()
+  });
+
+  localStorage.setItem("data", JSON.stringify(data));
+  alert("Saved!");
+  location.reload();
+}
+
+function loadDashboard(){
+  let totalIncome=0, due=0, paid=0, land=0;
+
+  data.forEach(d=>{
+    totalIncome += d.total;
+    due += d.due;
+    paid += d.paid;
+    land += d.amount;
+  });
+
+  document.getElementById("todayIncome").innerText = totalIncome;
+  document.getElementById("due").innerText = due;
+  document.getElementById("paid").innerText = paid;
+  document.getElementById("totalLand").innerText = land;
+}
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>
